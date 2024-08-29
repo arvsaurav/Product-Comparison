@@ -10,6 +10,18 @@
     height: 30px;
 }
 
+.sidebar-items:nth-child(1) {
+    position: sticky;
+    top: 75px;
+    z-index: 1;
+}
+
+.sidebar-items:nth-child(2) {
+    position: sticky;
+    top: 120px;
+    z-index: 1;
+}
+
 .sidebar-items a {
     display: block;
     height: 20px;

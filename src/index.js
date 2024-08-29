@@ -6,6 +6,8 @@ import PageNotFound from './components/PageNotFound/PageNotFound';
 import ProductDetails from './components/ProductDetails/ProductDetails';
 import CompareProducts from './components/CompareProducts/CompareProducts';
 import About from './components/About/About';
+import { Provider } from 'react-redux';
+import { store } from './redux-store/store';
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -19,8 +21,8 @@ const router = createBrowserRouter(
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <>
+    <Provider store={store}>
         <RouterProvider router={router} />
-    </>
+    </Provider>
 );
 
