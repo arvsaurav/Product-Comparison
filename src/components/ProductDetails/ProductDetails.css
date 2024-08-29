@@ -3,3 +3,7 @@
     overflow-y: scroll;
     min-width: 500px;
 }
+
+.products-component-parent-div h2 {
+    padding: 10px 10px 10px 0;
+}

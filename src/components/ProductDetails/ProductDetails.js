@@ -5,21 +5,33 @@ import { appendProducts } from '../../redux-store/slices/productSlice';
 import { Button, Image, Space, Table, notification } from 'antd';
 import Column from 'antd/es/table/Column';
 import './ProductDetails.css';
+import { setCompareList } from '../../redux-store/slices/compareProductSlice';
+import { useNavigate } from 'react-router-dom';
 
 function ProductDetails() {
     const products = useSelector((state) => state.products.productList);
+    const compareProducts = useSelector((state) => state.compareProducts.compareProductList);
     const dispatch = useDispatch();
     const containerRef = useRef(null);
+    const navigate = useNavigate();
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
         total: 0
     })
 
+    const [api, contextHolder] = notification.useNotification();
+    const showNotification = useCallback((type, heading, description) => {
+        api[type]({
+            message: heading,
+            description: description,
+        });
+    }, [api]);
+
     const getProducts = useCallback(async (page, pageSize) => {
         const skip = (page - 1) * pageSize;
         // already fetched data
-        if (skip < products.length) {
+        if (skip < products.length && skip + pageSize < products.length) {
             setPagination(prev => ({
                 ...prev,
                 current: page,
@@ -37,29 +49,42 @@ function ProductDetails() {
             }));
         }
         else {
-            alert("Something went wrong");
+            showNotification('error', 'Error!', "Something went wrong.");
         }
-    }, [dispatch, products.length]);
+    }, [dispatch, products.length, showNotification]);
 
-    const handlePageChange = (pagination) => {
+    const handlePageChange = ({current, pageSize}) => {
         // scroll to top
         containerRef.current.scrollTop = '0';
-        //window.scrollTo({ top: 0, behavior: 'smooth' });
-        getProducts(pagination.current, pagination.pageSize);
+        getProducts(current, pageSize);
     }
 
-    const handleAddToCompare = (id) => {
-        document.getElementById(id).disabled = true;
-        showNotification('success');
-    }
+    const handleAddToCompare = (product) => {
+        if(compareProducts.length === 4) {
+            showNotification('warning', 'Warning!', "Maximum 4 products can be added for comparison.");
+            return;
+        }
+        document.getElementById(product.id).disabled = true;
 
-    const [api, contextHolder] = notification.useNotification();
-    const showNotification = (type) => {
-        api[type]({
-            message: 'Success!',
-            description: 'Added for comparison.',
-        });
-    };
+        var isAlreadyPresentInComparisonList = false;
+        compareProducts.forEach((availableProduct) => {
+            if(availableProduct.id === product.id) {
+                isAlreadyPresentInComparisonList = true;
+            }
+        })
+        if(isAlreadyPresentInComparisonList) {
+            showNotification('warning', 'Warning!', "Already added for comparison.");
+        }
+        else {
+            dispatch(setCompareList([...compareProducts, product]));
+            showNotification('success', 'Success!', 'Added for comparison.');
+            if(compareProducts.length === 1) {
+                setTimeout(() => {
+                    navigate('compareProducts');
+                }, 500)
+            }
+        }    
+    }
 
     useEffect(() => {
         if(products.length === 0) {
@@ -72,7 +97,8 @@ function ProductDetails() {
             { contextHolder }
             <h2>Products</h2>
             <Table 
-                dataSource={products} 
+                dataSource={products.map(product => ({ ...product, key: product.id }))} 
+                // dataSource={products}
                 pagination={{
                     current: pagination.current,
                     pageSize: pagination.pageSize,
@@ -92,7 +118,6 @@ function ProductDetails() {
                         // Hide page numbers
                         return null;
                     }
-
                 }}
                 onChange={handlePageChange}
             >
@@ -113,7 +138,8 @@ function ProductDetails() {
                     dataIndex='price'
                     key='price'
                     width='6.25%'
-                    sorter={(a, b) => a.price - b.price} // Sorting function
+                    // defaultSortOrder= 'descend'
+                    // sorter={(a, b) => a.price - b.price} // Sorting function
                 />
                 <Column 
                     title='Discount %'
@@ -151,7 +177,7 @@ function ProductDetails() {
                     width='12.5%'
                     render={(_, record) => (
                         <Space size='middle'>
-                            <Button id={record.id} onClick={() => handleAddToCompare(record.id)}>Add to compare</Button>
+                            <Button id={record.id} onClick={() => handleAddToCompare(record)}>Add to compare</Button>
                         </Space>
                     )}
                 />
