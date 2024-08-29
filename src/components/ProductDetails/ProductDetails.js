@@ -113,7 +113,6 @@ function ProductDetails() {
                     dataIndex='price'
                     key='price'
                     width='6.25%'
-                    defaultSortOrder= 'descend'
                     sorter={(a, b) => a.price - b.price} // Sorting function
                 />
                 <Column 

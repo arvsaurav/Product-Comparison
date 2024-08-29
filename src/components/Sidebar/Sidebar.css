@@ -1,13 +1,15 @@
 .sidebar {
     display: flex;
     flex-direction: column;
+    min-width: 150px;
+    margin-right: 5px;
     box-shadow: 5px 0 5px -2px #bdbdbd;
 }
 
 .sidebar-items {
     margin: 10px 0 0 0;
     padding: 5px 0 5px 0;
-    height: 30px;
+    height: 40px;
 }
 
 .sidebar-items:nth-child(1) {
@@ -23,12 +25,13 @@
 }
 
 .sidebar-items a {
-    display: block;
-    height: 20px;
+    display: flex;
+    align-items: center;
+    height: 30px;
     padding: 5px 0 5px 5px;
     text-decoration: none;
     color: black;
-
+    
     &:hover {
         background-color: #ded9d9;
     }

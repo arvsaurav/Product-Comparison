@@ -8,7 +8,6 @@
     display: grid;
     grid-template-columns: 1fr 4fr;
     height: calc(100vh - 60px);
-    min-width: 1080px;
 }
 
 @media only screen and (max-width: 880px) {
